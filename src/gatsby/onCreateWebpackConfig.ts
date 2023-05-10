@@ -5,24 +5,7 @@ import path from 'path';
 
 import {sentryWebpackPlugin} from '@sentry/webpack-plugin';
 
-const getPlugins = reporter => {
-  const authToken = process.env.SENTRY_AUTH_TOKEN;
-  if (!authToken) {
-    reporter.warn('SENTRY_AUTH_TOKEN is not set - will not upload source maps');
-    return [];
-  }
-  return [
-    sentryWebpackPlugin({
-      org: process.env.SENTRY_PROJECT,
-      project: process.env.SENTRY_ORG,
-      authToken,
-      sourcemaps: {assets: './public/**'},
-      disable: process.env.NODE_ENV !== 'production',
-    }),
-  ];
-};
-
-function main({actions, reporter}) {
+function main({actions}) {
   actions.setWebpackConfig({
     resolve: {
       fallback: {
@@ -33,7 +16,15 @@ function main({actions, reporter}) {
         '~src': path.join(path.resolve(__dirname, '..')),
       },
     },
-    plugins: getPlugins(reporter),
+    plugins: [
+      sentryWebpackPlugin({
+        org: process.env.SENTRY_PROJECT,
+        project: process.env.SENTRY_ORG,
+        authToken: process.env.SENTRY_WEBPACK_PLUGIN_AUTH_TOKEN,
+        sourcemaps: {assets: './public/**'},
+        disable: process.env.NODE_ENV !== 'production',
+      }),
+    ],
   });
 }
 
