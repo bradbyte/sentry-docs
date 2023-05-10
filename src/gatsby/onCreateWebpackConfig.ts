@@ -3,7 +3,7 @@
 
 import path from 'path';
 
-import SentryWebpackPlugin from '@sentry/webpack-plugin';
+import {sentryWebpackPlugin} from '@sentry/webpack-plugin';
 
 const getPlugins = reporter => {
   const authToken = process.env.SENTRY_AUTH_TOKEN;
@@ -12,13 +12,12 @@ const getPlugins = reporter => {
     return [];
   }
   return [
-    new SentryWebpackPlugin({
+    sentryWebpackPlugin({
       org: process.env.SENTRY_PROJECT,
       project: process.env.SENTRY_ORG,
       authToken,
-      include: ['public'],
-      stripPrefix: ['public/'],
-      dryRun: process.env.NODE_ENV !== 'production',
+      sourcemaps: {assets: './public/**'},
+      disable: process.env.NODE_ENV !== 'production',
     }),
   ];
 };
